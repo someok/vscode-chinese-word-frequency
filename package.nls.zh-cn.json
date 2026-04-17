@@ -3,6 +3,7 @@
   "command.analyzeActiveEditor.title": "分析",
   "command.highlightTerm.title": "高亮词语",
   "command.highlightTermReverse.title": "向上",
+  "command.clearHighlights.title": "清除高亮",
   "configuration.wordFrequency.ignoreTerms.description": "统计时需要忽略的词语。每项表示一个词。User + Workspace + Workspace Folder 配置会合并并去重。",
   "configuration.wordFrequency.maxResults.description": "面板中最多显示的词频条目数量。",
   "configuration.wordFrequency.tokenizerEngine.description": "中文分词引擎。可选择 `jieba` 对比效果，也可随时切回 `segmentit`。"

@@ -6,6 +6,7 @@ import { ChineseTokenizer, JiebaTokenizer, type TokenizerEngine } from './tokeni
 const ANALYZE_COMMAND = 'wordFrequency.analyzeActiveEditor'
 const HIGHLIGHT_COMMAND = 'wordFrequency.highlightTerm'
 const HIGHLIGHT_REVERSE_COMMAND = 'wordFrequency.highlightTermReverse'
+const CLEAR_HIGHLIGHTS_COMMAND = 'wordFrequency.clearHighlights'
 const VIEW_ID = 'wordFrequencyView'
 const CONFIG_NAMESPACE = 'wordFrequency'
 const IGNORE_TERMS_KEY = 'ignoreTerms'
@@ -45,6 +46,7 @@ export function activate(context: vscode.ExtensionContext): void {
     showCollapseAll: false,
   })
 
+  setHasHighlightsContext(false)
   context.subscriptions.push(treeView, highlightDecorationType, activeHighlightDecorationType)
 
   context.subscriptions.push(
@@ -77,16 +79,17 @@ export function activate(context: vscode.ExtensionContext): void {
         highlightNavigationRef,
       )
     }),
+    vscode.commands.registerCommand(CLEAR_HIGHLIGHTS_COMMAND, () => {
+      clearAllHighlights(highlightNavigationRef, highlightDecorationType, activeHighlightDecorationType)
+    }),
   )
 
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor(() => {
-      clearHighlightInVisibleEditors(highlightDecorationType, activeHighlightDecorationType)
-      highlightNavigationRef.value = undefined
+      clearAllHighlights(highlightNavigationRef, highlightDecorationType, activeHighlightDecorationType)
     }),
     vscode.workspace.onDidCloseTextDocument(() => {
-      clearHighlightInVisibleEditors(highlightDecorationType, activeHighlightDecorationType)
-      highlightNavigationRef.value = undefined
+      clearAllHighlights(highlightNavigationRef, highlightDecorationType, activeHighlightDecorationType)
     }),
   )
 }
@@ -212,15 +215,14 @@ async function highlightTermInEditor(
 ): Promise<void> {
   const editor = vscode.window.activeTextEditor
   if (!editor) {
-    navigationRef.value = undefined
+    clearAllHighlights(navigationRef, decorationType, activeDecorationType)
     void vscode.window.showInformationMessage(vscode.l10n.t('There is no active editor to highlight in.'))
     return
   }
 
   const ranges = findAllRanges(editor.document, term)
   if (ranges.length === 0) {
-    clearHighlightInVisibleEditors(decorationType, activeDecorationType)
-    navigationRef.value = undefined
+    clearAllHighlights(navigationRef, decorationType, activeDecorationType)
     void vscode.window.showWarningMessage(vscode.l10n.t('Could not find "{0}" in the current document.', term))
     return
   }
@@ -233,7 +235,7 @@ async function highlightTermInEditor(
 
   const focusedEditor = await focusEditorForEditing(editor)
   if (!focusedEditor) {
-    navigationRef.value = undefined
+    clearAllHighlights(navigationRef, decorationType, activeDecorationType)
     return
   }
 
@@ -250,8 +252,18 @@ async function highlightTermInEditor(
     documentKey,
     lastStartOffset: focusedEditor.document.offsetAt(activeRange.start),
   }
+  setHasHighlightsContext(true)
 
   activateRange(focusedEditor, activeRange)
+}
+
+function clearAllHighlights(
+  navigationRef: HighlightNavigationRef,
+  ...decorationTypes: vscode.TextEditorDecorationType[]
+): void {
+  clearHighlightInVisibleEditors(...decorationTypes)
+  navigationRef.value = undefined
+  setHasHighlightsContext(false)
 }
 
 function clearHighlightInVisibleEditors(...decorationTypes: vscode.TextEditorDecorationType[]): void {
@@ -260,6 +272,10 @@ function clearHighlightInVisibleEditors(...decorationTypes: vscode.TextEditorDec
       editor.setDecorations(decorationType, [])
     }
   }
+}
+
+function setHasHighlightsContext(value: boolean): void {
+  void vscode.commands.executeCommand('setContext', 'wordFrequency.hasHighlights', value)
 }
 
 function findAllRanges(document: vscode.TextDocument, term: string): vscode.Range[] {

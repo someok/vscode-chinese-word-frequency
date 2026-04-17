@@ -52,6 +52,18 @@
           "light": "media/up-light.svg",
           "dark": "media/up-dark.svg"
         }
+      },
+      {
+        "command": "wordFrequency.clearHighlights",
+        "title": "%command.clearHighlights.title%",
+        "category": "%wordFrequency.title%"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "wordFrequency.clearHighlights",
+        "key": "escape",
+        "when": "editorTextFocus && wordFrequency.hasHighlights"
       }
     ],
     "views": {

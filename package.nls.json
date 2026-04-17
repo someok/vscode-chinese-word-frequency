@@ -3,6 +3,7 @@
   "command.analyzeActiveEditor.title": "Analyze",
   "command.highlightTerm.title": "Highlight Term",
   "command.highlightTermReverse.title": "Up",
+  "command.clearHighlights.title": "Clear Highlights",
   "configuration.wordFrequency.ignoreTerms.description": "Terms to ignore while counting. One item per line. User + Workspace + Workspace Folder values are merged and deduplicated.",
   "configuration.wordFrequency.maxResults.description": "Maximum number of frequency rows displayed in the panel.",
   "configuration.wordFrequency.tokenizerEngine.description": "Tokenizer engine used for Chinese segmentation. Choose `jieba` to compare quality, or switch back to `segmentit` anytime."
