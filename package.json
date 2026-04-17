@@ -57,9 +57,9 @@
       "explorer": [
         {
           "id": "wordFrequencyView",
-          "name": "词频分析",
+          "name": "Word Frequency",
           "icon": "media/view-icon.svg",
-          "contextualTitle": "词频分析"
+          "contextualTitle": "Word Frequency"
         }
       ]
     },
