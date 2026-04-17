@@ -1,5 +1,10 @@
 **/.git/**
 **/.DS_Store
+**/node_modules/**
+**/.vscode/**
+**/*.map
+eslint.config.mjs
 src/**
 tsconfig.json
 tasks.md
+media/icon.svg

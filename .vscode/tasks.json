@@ -5,14 +5,14 @@
       "type": "npm",
       "script": "compile",
       "group": "build",
-      "problemMatcher": "$tsc",
+      "problemMatcher": [],
       "label": "npm: compile"
     },
     {
       "type": "npm",
       "script": "watch",
       "isBackground": true,
-      "problemMatcher": "$tsc-watch",
+      "problemMatcher": [],
       "label": "npm: watch"
     }
   ]

@@ -58,18 +58,23 @@
     }
   },
   "scripts": {
-    "compile": "tsc -p ./",
-    "watch": "tsc -watch -p ./",
+    "check-types": "tsc --noEmit -p ./",
+    "compile": "npm run check-types && node ./scripts/build.mjs",
+    "compile:prod": "npm run check-types && node ./scripts/build.mjs --production",
+    "watch": "node ./scripts/build.mjs --watch",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
-    "vscode:prepublish": "npm run compile",
+    "vscode:prepublish": "npm run compile:prod",
     "package": "npx @vscode/vsce package"
   },
-  "dependencies": { "segmentit": "^2.0.3" },
+  "dependencies": {
+    "segmentit": "^2.0.3"
+  },
   "devDependencies": {
     "@antfu/eslint-config": "^3.13.0",
     "@types/node": "^22.10.1",
     "@types/vscode": "^1.85.0",
+    "esbuild": "^0.25.11",
     "eslint": "^9.21.0",
     "typescript": "^5.8.2"
   }
