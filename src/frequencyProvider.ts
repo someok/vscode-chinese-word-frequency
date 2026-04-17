@@ -32,7 +32,8 @@ export class WordFrequencyProvider implements vscode.TreeDataProvider<vscode.Tre
   public readonly onDidChangeTreeData = this.onDidChangeTreeDataEmitter.event
 
   private items: FrequencyItem[] = []
-  private emptyMessage = vscode.l10n.t('No data. Click "Analyze" to start.')
+  private readonly defaultEmptyMessage = vscode.l10n.t('No data. Click "Analyze" to start.')
+  private emptyMessage = this.defaultEmptyMessage
 
   public setEntries(entries: readonly FrequencyEntry[]): void {
     this.items = entries.map(entry => new FrequencyItem(entry))
@@ -41,9 +42,7 @@ export class WordFrequencyProvider implements vscode.TreeDataProvider<vscode.Tre
 
   public clear(message?: string): void {
     this.items = []
-    if (message) {
-      this.emptyMessage = message
-    }
+    this.emptyMessage = message ?? this.defaultEmptyMessage
     this.refresh()
   }
 

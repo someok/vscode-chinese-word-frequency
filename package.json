@@ -40,6 +40,12 @@
         "category": "%wordFrequency.title%"
       },
       {
+        "command": "wordFrequency.clearResults",
+        "title": "%command.clearResults.title%",
+        "category": "%wordFrequency.title%",
+        "enablement": "wordFrequency.hasResults"
+      },
+      {
         "command": "wordFrequency.highlightTerm",
         "title": "%command.highlightTerm.title%",
         "category": "%wordFrequency.title%"
@@ -81,7 +87,12 @@
         {
           "command": "wordFrequency.analyzeActiveEditor",
           "when": "view == wordFrequencyView",
-          "group": "navigation"
+          "group": "navigation@1"
+        },
+        {
+          "command": "wordFrequency.clearResults",
+          "when": "view == wordFrequencyView",
+          "group": "navigation@2"
         }
       ],
       "view/item/context": [

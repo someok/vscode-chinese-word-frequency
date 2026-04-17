@@ -1,6 +1,7 @@
 {
   "wordFrequency.title": "Word Frequency",
   "command.analyzeActiveEditor.title": "Analyze",
+  "command.clearResults.title": "Clear",
   "command.highlightTerm.title": "Highlight Term",
   "command.highlightTermReverse.title": "Up",
   "command.clearHighlights.title": "Clear Highlights",

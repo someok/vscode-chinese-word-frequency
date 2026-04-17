@@ -4,6 +4,7 @@ import { WordFrequencyProvider } from './frequencyProvider'
 import { ChineseTokenizer, JiebaTokenizer, type TokenizerEngine } from './tokenizer'
 
 const ANALYZE_COMMAND = 'wordFrequency.analyzeActiveEditor'
+const CLEAR_RESULTS_COMMAND = 'wordFrequency.clearResults'
 const HIGHLIGHT_COMMAND = 'wordFrequency.highlightTerm'
 const HIGHLIGHT_REVERSE_COMMAND = 'wordFrequency.highlightTermReverse'
 const CLEAR_HIGHLIGHTS_COMMAND = 'wordFrequency.clearHighlights'
@@ -46,12 +47,19 @@ export function activate(context: vscode.ExtensionContext): void {
     showCollapseAll: false,
   })
 
+  setHasResultsContext(false)
   setHasHighlightsContext(false)
   context.subscriptions.push(treeView, highlightDecorationType, activeHighlightDecorationType)
 
   context.subscriptions.push(
     vscode.commands.registerCommand(ANALYZE_COMMAND, async () => {
-      await analyzeActiveEditor(provider, segmentitTokenizer, jiebaTokenizer)
+      const hasResults = await analyzeActiveEditor(provider, segmentitTokenizer, jiebaTokenizer)
+      setHasResultsContext(hasResults)
+    }),
+    vscode.commands.registerCommand(CLEAR_RESULTS_COMMAND, () => {
+      provider.clear()
+      setHasResultsContext(false)
+      clearAllHighlights(highlightNavigationRef, highlightDecorationType, activeHighlightDecorationType)
     }),
     vscode.commands.registerCommand(HIGHLIGHT_COMMAND, async (term: unknown) => {
       const normalizedTerm = resolveTerm(term, treeView)
@@ -102,19 +110,19 @@ async function analyzeActiveEditor(
   provider: WordFrequencyProvider,
   segmentitTokenizer: ChineseTokenizer,
   jiebaTokenizer: JiebaTokenizer,
-): Promise<void> {
+): Promise<boolean> {
   const editor = vscode.window.activeTextEditor
   if (!editor) {
     provider.clear(vscode.l10n.t('No active editor detected.'))
     void vscode.window.showInformationMessage(vscode.l10n.t('Open and focus an editor before analyzing.'))
-    return
+    return false
   }
 
   const text = editor.document.getText()
   if (!text.trim()) {
     provider.clear(vscode.l10n.t('Document is empty. Nothing to analyze.'))
     void vscode.window.showInformationMessage(vscode.l10n.t('Current document is empty.'))
-    return
+    return false
   }
 
   const ignoreTerms = readMergedIgnoreTerms(editor.document.uri)
@@ -127,10 +135,11 @@ async function analyzeActiveEditor(
   if (sortedEntries.length === 0) {
     provider.clear(vscode.l10n.t('No terms were found. Adjust ignore terms and try again.'))
     void vscode.window.showInformationMessage(vscode.l10n.t('Analysis is complete, but there are no terms to display.'))
-    return
+    return false
   }
 
   provider.setEntries(sortedEntries)
+  return true
 }
 
 function countFrequencies(tokens: readonly string[], ignoreTerms: ReadonlySet<string>): Map<string, number> {
@@ -276,6 +285,10 @@ function clearHighlightInVisibleEditors(...decorationTypes: vscode.TextEditorDec
 
 function setHasHighlightsContext(value: boolean): void {
   void vscode.commands.executeCommand('setContext', 'wordFrequency.hasHighlights', value)
+}
+
+function setHasResultsContext(value: boolean): void {
+  void vscode.commands.executeCommand('setContext', 'wordFrequency.hasResults', value)
 }
 
 function findAllRanges(document: vscode.TextDocument, term: string): vscode.Range[] {

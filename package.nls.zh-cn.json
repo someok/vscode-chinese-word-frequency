@@ -1,6 +1,7 @@
 {
   "wordFrequency.title": "词频分析",
   "command.analyzeActiveEditor.title": "分析",
+  "command.clearResults.title": "清除",
   "command.highlightTerm.title": "高亮词语",
   "command.highlightTermReverse.title": "向上",
   "command.clearHighlights.title": "清除高亮",
