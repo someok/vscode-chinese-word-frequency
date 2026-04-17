@@ -9,6 +9,7 @@ export class FrequencyItem extends vscode.TreeItem {
   constructor(public readonly entry: FrequencyEntry) {
     super(`${entry.term} - ${entry.count}`, vscode.TreeItemCollapsibleState.None);
 
+    this.iconPath = new vscode.ThemeIcon("symbol-string");
     this.tooltip = new vscode.MarkdownString(`**${entry.term}**\n\n出现次数：${entry.count}`);
     this.command = {
       command: "wordFrequency.highlightTerm",
