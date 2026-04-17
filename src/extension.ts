@@ -13,14 +13,25 @@ const TOKENIZER_ENGINE_KEY = 'tokenizerEngine'
 const MIN_TERM_CHAR_LENGTH = 2
 const MIN_TERM_COUNT = 2
 
+type HighlightNavigationState = {
+  term: string
+  documentKey: string
+  currentIndex: number
+}
+
+type HighlightNavigationRef = {
+  value: HighlightNavigationState | undefined
+}
+
 export function activate(context: vscode.ExtensionContext): void {
   const provider = new WordFrequencyProvider()
   const segmentitTokenizer = new ChineseTokenizer()
   const jiebaTokenizer = new JiebaTokenizer()
+  const highlightNavigationRef: HighlightNavigationRef = { value: undefined }
   const highlightDecorationType = vscode.window.createTextEditorDecorationType({
     backgroundColor: new vscode.ThemeColor('editor.findMatchHighlightBackground'),
     border: '1px solid',
-    borderColor: new vscode.ThemeColor('editor.findMatchBorder'),
+    borderColor: new vscode.ThemeColor('editorError.foreground'),
   })
 
   const treeView = vscode.window.createTreeView(VIEW_ID, {
@@ -34,20 +45,22 @@ export function activate(context: vscode.ExtensionContext): void {
     vscode.commands.registerCommand(ANALYZE_COMMAND, async () => {
       await analyzeActiveEditor(provider, segmentitTokenizer, jiebaTokenizer)
     }),
-    vscode.commands.registerCommand(HIGHLIGHT_COMMAND, (term: unknown) => {
+    vscode.commands.registerCommand(HIGHLIGHT_COMMAND, async (term: unknown) => {
       if (typeof term !== 'string' || !term.trim()) {
         return
       }
-      highlightTermInEditor(term, highlightDecorationType)
+      await highlightTermInEditor(term, highlightDecorationType, highlightNavigationRef)
     }),
   )
 
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor(() => {
       clearHighlightInVisibleEditors(highlightDecorationType)
+      highlightNavigationRef.value = undefined
     }),
     vscode.workspace.onDidCloseTextDocument(() => {
       clearHighlightInVisibleEditors(highlightDecorationType)
+      highlightNavigationRef.value = undefined
     }),
   )
 }
@@ -164,24 +177,51 @@ function readTokenizerEngine(uri: vscode.Uri): TokenizerEngine {
   return 'segmentit'
 }
 
-function highlightTermInEditor(term: string, decorationType: vscode.TextEditorDecorationType): void {
+async function highlightTermInEditor(
+  term: string,
+  decorationType: vscode.TextEditorDecorationType,
+  navigationRef: HighlightNavigationRef,
+): Promise<void> {
   const editor = vscode.window.activeTextEditor
   if (!editor) {
+    navigationRef.value = undefined
     void vscode.window.showInformationMessage('当前没有可高亮的活动编辑器。')
     return
   }
 
-  clearHighlightInVisibleEditors(decorationType)
-
   const ranges = findAllRanges(editor.document, term)
-  editor.setDecorations(decorationType, ranges)
-
   if (ranges.length === 0) {
+    clearHighlightInVisibleEditors(decorationType)
+    navigationRef.value = undefined
     void vscode.window.showWarningMessage(`未在当前文档中找到「${term}」。`)
     return
   }
 
-  editor.revealRange(ranges[0], vscode.TextEditorRevealType.InCenterIfOutsideViewport)
+  const documentKey = editor.document.uri.toString()
+  const previous = navigationRef.value
+  const isSameTerm
+    = previous?.term === term
+      && previous?.documentKey === documentKey
+  const currentIndex = isSameTerm
+    ? ((previous?.currentIndex ?? 0) + 1) % ranges.length
+    : 0
+
+  const focusedEditor = await focusEditorForEditing(editor)
+  if (!focusedEditor) {
+    navigationRef.value = undefined
+    return
+  }
+
+  clearHighlightInVisibleEditors(decorationType)
+  focusedEditor.setDecorations(decorationType, ranges)
+
+  navigationRef.value = {
+    term,
+    documentKey,
+    currentIndex,
+  }
+
+  activateRange(focusedEditor, ranges[currentIndex])
 }
 
 function clearHighlightInVisibleEditors(decorationType: vscode.TextEditorDecorationType): void {
@@ -214,6 +254,23 @@ function findAllRanges(document: vscode.TextDocument, term: string): vscode.Rang
   }
 
   return ranges
+}
+
+function activateRange(editor: vscode.TextEditor, range: vscode.Range): void {
+  editor.selection = new vscode.Selection(range.start, range.end)
+  editor.revealRange(range, vscode.TextEditorRevealType.InCenterIfOutsideViewport)
+}
+
+async function focusEditorForEditing(editor: vscode.TextEditor): Promise<vscode.TextEditor | undefined> {
+  try {
+    return await vscode.window.showTextDocument(editor.document, {
+      preserveFocus: false,
+      viewColumn: editor.viewColumn,
+    })
+  }
+  catch {
+    return vscode.window.activeTextEditor
+  }
 }
 
 function escapeRegExp(input: string): string {
