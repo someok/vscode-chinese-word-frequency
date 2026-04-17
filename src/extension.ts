@@ -1,7 +1,7 @@
 import type { FrequencyEntry } from './frequencyProvider'
 import * as vscode from 'vscode'
 import { WordFrequencyProvider } from './frequencyProvider'
-import { ChineseTokenizer } from './tokenizer'
+import { ChineseTokenizer, JiebaTokenizer, type TokenizerEngine } from './tokenizer'
 
 const ANALYZE_COMMAND = 'wordFrequency.analyzeActiveEditor'
 const HIGHLIGHT_COMMAND = 'wordFrequency.highlightTerm'
@@ -9,11 +9,14 @@ const VIEW_ID = 'wordFrequencyView'
 const CONFIG_NAMESPACE = 'wordFrequency'
 const IGNORE_TERMS_KEY = 'ignoreTerms'
 const MAX_RESULTS_KEY = 'maxResults'
+const TOKENIZER_ENGINE_KEY = 'tokenizerEngine'
 const MIN_TERM_CHAR_LENGTH = 2
+const MIN_TERM_COUNT = 2
 
 export function activate(context: vscode.ExtensionContext): void {
   const provider = new WordFrequencyProvider()
-  const tokenizer = new ChineseTokenizer()
+  const segmentitTokenizer = new ChineseTokenizer()
+  const jiebaTokenizer = new JiebaTokenizer()
   const highlightDecorationType = vscode.window.createTextEditorDecorationType({
     backgroundColor: new vscode.ThemeColor('editor.findMatchHighlightBackground'),
     border: '1px solid',
@@ -29,7 +32,7 @@ export function activate(context: vscode.ExtensionContext): void {
 
   context.subscriptions.push(
     vscode.commands.registerCommand(ANALYZE_COMMAND, async () => {
-      await analyzeActiveEditor(provider, tokenizer)
+      await analyzeActiveEditor(provider, segmentitTokenizer, jiebaTokenizer)
     }),
     vscode.commands.registerCommand(HIGHLIGHT_COMMAND, (term: unknown) => {
       if (typeof term !== 'string' || !term.trim()) {
@@ -53,7 +56,11 @@ export function deactivate(): void {
   // No-op. Disposables are managed by VS Code subscriptions.
 }
 
-async function analyzeActiveEditor(provider: WordFrequencyProvider, tokenizer: ChineseTokenizer): Promise<void> {
+async function analyzeActiveEditor(
+  provider: WordFrequencyProvider,
+  segmentitTokenizer: ChineseTokenizer,
+  jiebaTokenizer: JiebaTokenizer,
+): Promise<void> {
   const editor = vscode.window.activeTextEditor
   if (!editor) {
     provider.clear('未检测到活动编辑器')
@@ -70,6 +77,8 @@ async function analyzeActiveEditor(provider: WordFrequencyProvider, tokenizer: C
 
   const ignoreTerms = readMergedIgnoreTerms(editor.document.uri)
   const maxResults = readMaxResults(editor.document.uri)
+  const tokenizerEngine = readTokenizerEngine(editor.document.uri)
+  const tokenizer = tokenizerEngine === 'jieba' ? jiebaTokenizer : segmentitTokenizer
   const counts = countFrequencies(tokenizer.tokenize(text), ignoreTerms)
   const sortedEntries = sortEntries(counts).slice(0, maxResults)
 
@@ -100,6 +109,7 @@ function countFrequencies(tokens: readonly string[], ignoreTerms: ReadonlySet<st
 
 function sortEntries(counter: ReadonlyMap<string, number>): FrequencyEntry[] {
   return Array.from(counter.entries())
+    .filter(([, count]) => count >= MIN_TERM_COUNT)
     .map(([term, count]) => ({ term, count }))
     .sort((a, b) => b.count - a.count || a.term.localeCompare(b.term, 'zh-Hans-CN'))
 }
@@ -143,6 +153,15 @@ function readMaxResults(uri: vscode.Uri): number {
     return 300
   }
   return Math.max(10, Math.floor(value))
+}
+
+function readTokenizerEngine(uri: vscode.Uri): TokenizerEngine {
+  const config = vscode.workspace.getConfiguration(CONFIG_NAMESPACE, uri)
+  const value = config.get<string>(TOKENIZER_ENGINE_KEY, 'segmentit')
+  if (value === 'jieba') {
+    return 'jieba'
+  }
+  return 'segmentit'
 }
 
 function highlightTermInEditor(term: string, decorationType: vscode.TextEditorDecorationType): void {

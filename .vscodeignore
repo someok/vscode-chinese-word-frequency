@@ -3,7 +3,9 @@
 **/node_modules/**
 **/.vscode/**
 **/*.map
+.gitignore
 eslint.config.mjs
+scripts/**
 src/**
 tsconfig.json
 tasks.md

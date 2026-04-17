@@ -13,6 +13,7 @@
 - Explorer 下新增面板：`词频分析`
 - 标题按钮触发分析：`Analyze Active Editor`
 - 中文分词：基于 `segmentit`
+- 可切换分词引擎：`segmentit` / `jieba`
 - 词频结果按出现次数降序排列
 - 点击词条高亮全文匹配
 - 支持忽略词配置（User + Workspace + Workspace Folder 自动合并去重）
@@ -42,6 +43,20 @@
 - 类型：`number`
 - 默认：`300`
 - 说明：面板最多展示多少条词频结果
+
+### `wordFrequency.tokenizerEngine`
+
+- 类型：`"segmentit" | "jieba"`
+- 默认：`"segmentit"`
+- 说明：用于切换中文分词实现，便于对比效果并随时回退
+
+示例：
+
+```json
+{
+  "wordFrequency.tokenizerEngine": "jieba"
+}
+```
 
 ## 本地开发
 

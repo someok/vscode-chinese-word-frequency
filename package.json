@@ -5,8 +5,12 @@
   "version": "1.0.0",
   "publisher": "someok",
   "license": "MIT",
-  "engines": { "vscode": "^1.85.0" },
-  "categories": ["Other"],
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
   "icon": "media/icon.png",
   "main": "./out/extension.js",
   "repository": {
@@ -19,8 +23,16 @@
   },
   "contributes": {
     "commands": [
-      { "command": "wordFrequency.analyzeActiveEditor", "title": "Analyze Active Editor", "category": "Word Frequency" },
-      { "command": "wordFrequency.highlightTerm", "title": "Highlight Term", "category": "Word Frequency" }
+      {
+        "command": "wordFrequency.analyzeActiveEditor",
+        "title": "Analyze Active Editor",
+        "category": "Word Frequency"
+      },
+      {
+        "command": "wordFrequency.highlightTerm",
+        "title": "Highlight Term",
+        "category": "Word Frequency"
+      }
     ],
     "views": {
       "explorer": [
@@ -34,7 +46,11 @@
     },
     "menus": {
       "view/title": [
-        { "command": "wordFrequency.analyzeActiveEditor", "when": "view == wordFrequencyView", "group": "navigation" }
+        {
+          "command": "wordFrequency.analyzeActiveEditor",
+          "when": "view == wordFrequencyView",
+          "group": "navigation"
+        }
       ]
     },
     "configuration": {
@@ -42,7 +58,9 @@
       "properties": {
         "wordFrequency.ignoreTerms": {
           "type": "array",
-          "items": { "type": "string" },
+          "items": {
+            "type": "string"
+          },
           "default": [],
           "scope": "resource",
           "markdownDescription": "Terms to ignore while counting. One item per line. User + Workspace + Workspace Folder values are merged and deduplicated."
@@ -53,6 +71,16 @@
           "minimum": 10,
           "scope": "resource",
           "markdownDescription": "Maximum number of frequency rows displayed in the panel."
+        },
+        "wordFrequency.tokenizerEngine": {
+          "type": "string",
+          "enum": [
+            "segmentit",
+            "jieba"
+          ],
+          "default": "segmentit",
+          "scope": "resource",
+          "markdownDescription": "Tokenizer engine used for Chinese segmentation. Choose `jieba` to compare quality, or switch back to `segmentit` anytime."
         }
       }
     }
@@ -68,6 +96,7 @@
     "package": "npx @vscode/vsce package"
   },
   "dependencies": {
+    "jieba-wasm": "^2.4.0",
     "segmentit": "^2.0.3"
   },
   "devDependencies": {
