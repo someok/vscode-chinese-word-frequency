@@ -9,6 +9,7 @@ const VIEW_ID = 'wordFrequencyView'
 const CONFIG_NAMESPACE = 'wordFrequency'
 const IGNORE_TERMS_KEY = 'ignoreTerms'
 const MAX_RESULTS_KEY = 'maxResults'
+const MIN_TERM_CHAR_LENGTH = 2
 
 export function activate(context: vscode.ExtensionContext): void {
   const provider = new WordFrequencyProvider()
@@ -86,7 +87,7 @@ function countFrequencies(tokens: readonly string[], ignoreTerms: ReadonlySet<st
 
   for (const rawToken of tokens) {
     const token = normalizeTerm(rawToken)
-    if (!token || ignoreTerms.has(token)) {
+    if (!token || getTermLength(token) < MIN_TERM_CHAR_LENGTH || ignoreTerms.has(token)) {
       continue
     }
 
@@ -105,6 +106,10 @@ function sortEntries(counter: ReadonlyMap<string, number>): FrequencyEntry[] {
 
 function normalizeTerm(term: string): string {
   return term.trim()
+}
+
+function getTermLength(term: string): number {
+  return Array.from(term).length
 }
 
 function readMergedIgnoreTerms(uri: vscode.Uri): Set<string> {
