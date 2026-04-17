@@ -5,6 +5,7 @@ import { ChineseTokenizer, JiebaTokenizer, type TokenizerEngine } from './tokeni
 
 const ANALYZE_COMMAND = 'wordFrequency.analyzeActiveEditor'
 const HIGHLIGHT_COMMAND = 'wordFrequency.highlightTerm'
+const HIGHLIGHT_REVERSE_COMMAND = 'wordFrequency.highlightTermReverse'
 const VIEW_ID = 'wordFrequencyView'
 const CONFIG_NAMESPACE = 'wordFrequency'
 const IGNORE_TERMS_KEY = 'ignoreTerms'
@@ -22,6 +23,8 @@ type HighlightNavigationState = {
 type HighlightNavigationRef = {
   value: HighlightNavigationState | undefined
 }
+
+type JumpDirection = 'forward' | 'backward'
 
 export function activate(context: vscode.ExtensionContext): void {
   const provider = new WordFrequencyProvider()
@@ -49,10 +52,30 @@ export function activate(context: vscode.ExtensionContext): void {
       await analyzeActiveEditor(provider, segmentitTokenizer, jiebaTokenizer)
     }),
     vscode.commands.registerCommand(HIGHLIGHT_COMMAND, async (term: unknown) => {
-      if (typeof term !== 'string' || !term.trim()) {
+      const normalizedTerm = resolveTerm(term, treeView)
+      if (!normalizedTerm) {
         return
       }
-      await highlightTermInEditor(term, highlightDecorationType, activeHighlightDecorationType, highlightNavigationRef)
+      await highlightTermInEditor(
+        normalizedTerm,
+        'forward',
+        highlightDecorationType,
+        activeHighlightDecorationType,
+        highlightNavigationRef,
+      )
+    }),
+    vscode.commands.registerCommand(HIGHLIGHT_REVERSE_COMMAND, async (term: unknown) => {
+      const normalizedTerm = resolveTerm(term, treeView)
+      if (!normalizedTerm) {
+        return
+      }
+      await highlightTermInEditor(
+        normalizedTerm,
+        'backward',
+        highlightDecorationType,
+        activeHighlightDecorationType,
+        highlightNavigationRef,
+      )
     }),
   )
 
@@ -182,6 +205,7 @@ function readTokenizerEngine(uri: vscode.Uri): TokenizerEngine {
 
 async function highlightTermInEditor(
   term: string,
+  direction: JumpDirection,
   decorationType: vscode.TextEditorDecorationType,
   activeDecorationType: vscode.TextEditorDecorationType,
   navigationRef: HighlightNavigationRef,
@@ -206,9 +230,7 @@ async function highlightTermInEditor(
   const isSameTerm
     = previous?.term === term
       && previous?.documentKey === documentKey
-  const currentIndex = isSameTerm
-    ? ((previous?.currentIndex ?? 0) + 1) % ranges.length
-    : 0
+  const currentIndex = resolveCurrentIndex(previous, isSameTerm, direction, ranges.length)
 
   const focusedEditor = await focusEditorForEditing(editor)
   if (!focusedEditor) {
@@ -268,6 +290,40 @@ function findAllRanges(document: vscode.TextDocument, term: string): vscode.Rang
 function activateRange(editor: vscode.TextEditor, range: vscode.Range): void {
   editor.selection = new vscode.Selection(range.start, range.end)
   editor.revealRange(range, vscode.TextEditorRevealType.InCenterIfOutsideViewport)
+}
+
+function resolveTerm(term: unknown, treeView: vscode.TreeView<vscode.TreeItem>): string | undefined {
+  if (typeof term === 'string' && term.trim()) {
+    return term.trim()
+  }
+
+  const selected = treeView.selection[0] as { entry?: { term?: unknown } } | undefined
+  if (typeof selected?.entry?.term === 'string' && selected.entry.term.trim()) {
+    return selected.entry.term.trim()
+  }
+
+  return undefined
+}
+
+function resolveCurrentIndex(
+  previous: HighlightNavigationState | undefined,
+  isSameTerm: boolean,
+  direction: JumpDirection,
+  rangeCount: number,
+): number {
+  if (rangeCount <= 0) {
+    return 0
+  }
+
+  if (!isSameTerm) {
+    return direction === 'backward' ? rangeCount - 1 : 0
+  }
+
+  const previousIndex = previous?.currentIndex ?? 0
+  if (direction === 'backward') {
+    return (previousIndex - 1 + rangeCount) % rangeCount
+  }
+  return (previousIndex + 1) % rangeCount
 }
 
 async function focusEditorForEditing(editor: vscode.TextEditor): Promise<vscode.TextEditor | undefined> {

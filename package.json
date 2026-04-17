@@ -42,6 +42,15 @@
         "command": "wordFrequency.highlightTerm",
         "title": "Highlight Term",
         "category": "Word Frequency"
+      },
+      {
+        "command": "wordFrequency.highlightTermReverse",
+        "title": "Up",
+        "category": "Word Frequency",
+        "icon": {
+          "light": "media/up-light.svg",
+          "dark": "media/up-dark.svg"
+        }
       }
     ],
     "views": {
@@ -60,6 +69,13 @@
           "command": "wordFrequency.analyzeActiveEditor",
           "when": "view == wordFrequencyView",
           "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "wordFrequency.highlightTermReverse",
+          "when": "view == wordFrequencyView && viewItem == frequencyItem",
+          "group": "inline"
         }
       ]
     },
