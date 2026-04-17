@@ -37,13 +37,15 @@
       {
         "command": "wordFrequency.analyzeActiveEditor",
         "title": "%command.analyzeActiveEditor.title%",
-        "category": "%wordFrequency.title%"
+        "category": "%wordFrequency.title%",
+        "icon": "$(lightbulb-sparkle)"
       },
       {
         "command": "wordFrequency.clearResults",
         "title": "%command.clearResults.title%",
         "category": "%wordFrequency.title%",
-        "enablement": "wordFrequency.hasResults"
+        "enablement": "wordFrequency.hasResults",
+        "icon": "$(clear-all)"
       },
       {
         "command": "wordFrequency.highlightTerm",
@@ -54,10 +56,7 @@
         "command": "wordFrequency.highlightTermReverse",
         "title": "%command.highlightTermReverse.title%",
         "category": "%wordFrequency.title%",
-        "icon": {
-          "light": "media/up-light.svg",
-          "dark": "media/up-dark.svg"
-        }
+        "icon": "$(chevron-up)"
       },
       {
         "command": "wordFrequency.clearHighlights",
