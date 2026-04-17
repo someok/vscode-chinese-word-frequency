@@ -2,19 +2,35 @@
   "name": "vscode-chinese-word-frequency",
   "displayName": "Chinese Word Frequency",
   "description": "Analyze Chinese word frequency in the active editor and highlight selected terms.",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "publisher": "someok",
   "license": "MIT",
   "engines": { "vscode": "^1.85.0" },
   "categories": ["Other"],
+  "icon": "media/icon.png",
   "main": "./out/extension.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/someok/vscode-chinese-word-frequency.git"
+  },
+  "homepage": "https://github.com/someok/vscode-chinese-word-frequency",
+  "bugs": {
+    "url": "https://github.com/someok/vscode-chinese-word-frequency/issues"
+  },
   "contributes": {
     "commands": [
       { "command": "wordFrequency.analyzeActiveEditor", "title": "Analyze Active Editor", "category": "Word Frequency" },
       { "command": "wordFrequency.highlightTerm", "title": "Highlight Term", "category": "Word Frequency" }
     ],
     "views": {
-      "explorer": [{ "id": "wordFrequencyView", "name": "词频分析" }]
+      "explorer": [
+        {
+          "id": "wordFrequencyView",
+          "name": "词频分析",
+          "icon": "media/view-icon.svg",
+          "contextualTitle": "词频分析"
+        }
+      ]
     },
     "menus": {
       "view/title": [
@@ -47,7 +63,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "vscode:prepublish": "npm run compile",
-    "package": "vsce package"
+    "package": "npx @vscode/vsce package"
   },
   "dependencies": { "segmentit": "^2.0.3" },
   "devDependencies": {
