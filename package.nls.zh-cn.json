@@ -1,6 +1,6 @@
 {
   "wordFrequency.title": "词频分析",
-  "command.analyzeActiveEditor.title": "分析当前编辑器",
+  "command.analyzeActiveEditor.title": "分析",
   "command.highlightTerm.title": "高亮词语",
   "command.highlightTermReverse.title": "向上",
   "configuration.wordFrequency.ignoreTerms.description": "统计时需要忽略的词语。每项表示一个词。User + Workspace + Workspace Folder 配置会合并并去重。",

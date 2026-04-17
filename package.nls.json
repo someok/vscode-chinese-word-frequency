@@ -1,6 +1,6 @@
 {
   "wordFrequency.title": "Word Frequency",
-  "command.analyzeActiveEditor.title": "Analyze Active Editor",
+  "command.analyzeActiveEditor.title": "Analyze",
   "command.highlightTerm.title": "Highlight Term",
   "command.highlightTermReverse.title": "Up",
   "configuration.wordFrequency.ignoreTerms.description": "Terms to ignore while counting. One item per line. User + Workspace + Workspace Folder values are merged and deduplicated.",
