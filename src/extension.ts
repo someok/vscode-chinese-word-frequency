@@ -17,7 +17,7 @@ const MIN_TERM_COUNT = 2
 type HighlightNavigationState = {
   term: string
   documentKey: string
-  currentIndex: number
+  lastStartOffset: number
 }
 
 type HighlightNavigationRef = {
@@ -230,13 +230,14 @@ async function highlightTermInEditor(
   const isSameTerm
     = previous?.term === term
       && previous?.documentKey === documentKey
-  const currentIndex = resolveCurrentIndex(previous, isSameTerm, direction, ranges.length)
 
   const focusedEditor = await focusEditorForEditing(editor)
   if (!focusedEditor) {
     navigationRef.value = undefined
     return
   }
+
+  const currentIndex = resolveCurrentIndex(previous, isSameTerm, direction, ranges, focusedEditor, term)
 
   clearHighlightInVisibleEditors(decorationType, activeDecorationType)
   const activeRange = ranges[currentIndex]
@@ -247,7 +248,7 @@ async function highlightTermInEditor(
   navigationRef.value = {
     term,
     documentKey,
-    currentIndex,
+    lastStartOffset: focusedEditor.document.offsetAt(activeRange.start),
   }
 
   activateRange(focusedEditor, activeRange)
@@ -309,8 +310,11 @@ function resolveCurrentIndex(
   previous: HighlightNavigationState | undefined,
   isSameTerm: boolean,
   direction: JumpDirection,
-  rangeCount: number,
+  ranges: readonly vscode.Range[],
+  editor: vscode.TextEditor,
+  term: string,
 ): number {
+  const rangeCount = ranges.length
   if (rangeCount <= 0) {
     return 0
   }
@@ -319,11 +323,39 @@ function resolveCurrentIndex(
     return direction === 'backward' ? rangeCount - 1 : 0
   }
 
-  const previousIndex = previous?.currentIndex ?? 0
-  if (direction === 'backward') {
-    return (previousIndex - 1 + rangeCount) % rangeCount
+  const selectedOffset = getSelectedTermStartOffset(editor, term)
+  const anchorOffset = selectedOffset ?? previous?.lastStartOffset
+  if (anchorOffset === undefined) {
+    return direction === 'backward' ? rangeCount - 1 : 0
   }
-  return (previousIndex + 1) % rangeCount
+
+  const offsets = ranges.map(range => editor.document.offsetAt(range.start))
+
+  if (direction === 'backward') {
+    for (let index = rangeCount - 1; index >= 0; index -= 1) {
+      if (offsets[index] < anchorOffset) {
+        return index
+      }
+    }
+    return rangeCount - 1
+  }
+
+  const nextIndex = offsets.findIndex(offset => offset > anchorOffset)
+  return nextIndex === -1 ? 0 : nextIndex
+}
+
+function getSelectedTermStartOffset(editor: vscode.TextEditor, term: string): number | undefined {
+  const selection = editor.selection
+  if (selection.isEmpty) {
+    return undefined
+  }
+
+  const selectedText = editor.document.getText(selection)
+  if (selectedText !== term) {
+    return undefined
+  }
+
+  return editor.document.offsetAt(selection.start)
 }
 
 async function focusEditorForEditing(editor: vscode.TextEditor): Promise<vscode.TextEditor | undefined> {
