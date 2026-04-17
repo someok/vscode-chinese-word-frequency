@@ -13,6 +13,16 @@
   ],
   "icon": "media/icon.png",
   "main": "./out/extension.js",
+  "scripts": {
+    "check-types": "tsc --noEmit -p ./",
+    "compile": "npm run check-types && node ./scripts/build.mjs",
+    "compile:prod": "npm run check-types && node ./scripts/build.mjs --production",
+    "watch": "node ./scripts/build.mjs --watch",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "vscode:prepublish": "npm run compile:prod",
+    "package": "npx @vscode/vsce package"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/someok/vscode-chinese-word-frequency.git"
@@ -84,16 +94,6 @@
         }
       }
     }
-  },
-  "scripts": {
-    "check-types": "tsc --noEmit -p ./",
-    "compile": "npm run check-types && node ./scripts/build.mjs",
-    "compile:prod": "npm run check-types && node ./scripts/build.mjs --production",
-    "watch": "node ./scripts/build.mjs --watch",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "vscode:prepublish": "npm run compile:prod",
-    "package": "npx @vscode/vsce package"
   },
   "dependencies": {
     "jieba-wasm": "^2.4.0",
