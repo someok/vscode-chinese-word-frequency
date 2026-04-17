@@ -1,0 +1,84 @@
+{
+  "name": "vscode-chinese-word-frequency",
+  "displayName": "Chinese Word Frequency",
+  "description": "Analyze Chinese word frequency in the active editor and highlight selected terms.",
+  "version": "0.0.1",
+  "publisher": "local",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "onView:wordFrequencyView",
+    "onCommand:wordFrequency.analyzeActiveEditor",
+    "onCommand:wordFrequency.highlightTerm"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "wordFrequency.analyzeActiveEditor",
+        "title": "Analyze Active Editor",
+        "category": "Word Frequency"
+      },
+      {
+        "command": "wordFrequency.highlightTerm",
+        "title": "Highlight Term",
+        "category": "Word Frequency"
+      }
+    ],
+    "views": {
+      "explorer": [
+        {
+          "id": "wordFrequencyView",
+          "name": "词频分析"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "wordFrequency.analyzeActiveEditor",
+          "when": "view == wordFrequencyView",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Word Frequency",
+      "properties": {
+        "wordFrequency.ignoreTerms": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "default": [],
+          "scope": "resource",
+          "markdownDescription": "Terms to ignore while counting. One item per line. User + Workspace + Workspace Folder values are merged and deduplicated."
+        },
+        "wordFrequency.maxResults": {
+          "type": "number",
+          "default": 300,
+          "minimum": 10,
+          "scope": "resource",
+          "markdownDescription": "Maximum number of frequency rows displayed in the panel."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "package": "vsce package"
+  },
+  "dependencies": {
+    "segmentit": "^2.0.3"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.8.2"
+  }
+}
