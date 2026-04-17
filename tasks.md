@@ -22,7 +22,7 @@
 - [x] 13. 实现点击词条高亮：查找当前文档全部匹配并用 `TextEditorDecorationType` 高亮。
 - [x] 14. 实现高亮生命周期管理：切换词条替换高亮，编辑器切换/关闭时清理装饰器。
 - [x] 15. 增加边界处理：空文档、超大文档、无有效词条、分词异常时降级与提示。
-- [ ] 16. 本地联调验证：`F5` 启动 Extension Development Host，逐项验证按钮、排序、格式、点击高亮、忽略词配置。（`npm run compile` 已通过）
+- [ ] 16. 本地联调验证：`F5` 启动 Extension Development Host，逐项验证按钮、排序、格式、点击高亮、忽略词配置。（`npm run compile` 已通过，`launch/tasks` 调试配置已补齐）
 - [ ] 17. 补充 README（安装、配置、用法、截图）并打包产物（`vsce package`）。（README 已完成，打包待执行）
 
 ## 配置示例
