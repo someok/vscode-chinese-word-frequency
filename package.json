@@ -2,7 +2,7 @@
   "name": "vscode-chinese-word-frequency",
   "displayName": "Chinese Word Frequency",
   "description": "Analyze Chinese word frequency in the active editor and highlight selected terms.",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "publisher": "someok",
   "license": "MIT",
   "engines": {
@@ -13,6 +13,7 @@
   ],
   "icon": "media/icon.png",
   "main": "./out/extension.js",
+  "l10n": "./l10n",
   "scripts": {
     "check-types": "tsc --noEmit -p ./",
     "compile": "npm run check-types && node ./scripts/build.mjs",
@@ -35,18 +36,18 @@
     "commands": [
       {
         "command": "wordFrequency.analyzeActiveEditor",
-        "title": "Analyze Active Editor",
-        "category": "Word Frequency"
+        "title": "%command.analyzeActiveEditor.title%",
+        "category": "%wordFrequency.title%"
       },
       {
         "command": "wordFrequency.highlightTerm",
-        "title": "Highlight Term",
-        "category": "Word Frequency"
+        "title": "%command.highlightTerm.title%",
+        "category": "%wordFrequency.title%"
       },
       {
         "command": "wordFrequency.highlightTermReverse",
-        "title": "Up",
-        "category": "Word Frequency",
+        "title": "%command.highlightTermReverse.title%",
+        "category": "%wordFrequency.title%",
         "icon": {
           "light": "media/up-light.svg",
           "dark": "media/up-dark.svg"
@@ -57,9 +58,9 @@
       "explorer": [
         {
           "id": "wordFrequencyView",
-          "name": "Word Frequency",
+          "name": "%wordFrequency.title%",
           "icon": "media/view-icon.svg",
-          "contextualTitle": "Word Frequency"
+          "contextualTitle": "%wordFrequency.title%"
         }
       ]
     },
@@ -80,7 +81,7 @@
       ]
     },
     "configuration": {
-      "title": "Word Frequency",
+      "title": "%wordFrequency.title%",
       "properties": {
         "wordFrequency.ignoreTerms": {
           "type": "array",
@@ -89,14 +90,14 @@
           },
           "default": [],
           "scope": "resource",
-          "markdownDescription": "Terms to ignore while counting. One item per line. User + Workspace + Workspace Folder values are merged and deduplicated."
+          "markdownDescription": "%configuration.wordFrequency.ignoreTerms.description%"
         },
         "wordFrequency.maxResults": {
           "type": "number",
           "default": 300,
           "minimum": 10,
           "scope": "resource",
-          "markdownDescription": "Maximum number of frequency rows displayed in the panel."
+          "markdownDescription": "%configuration.wordFrequency.maxResults.description%"
         },
         "wordFrequency.tokenizerEngine": {
           "type": "string",
@@ -106,7 +107,7 @@
           ],
           "default": "segmentit",
           "scope": "resource",
-          "markdownDescription": "Tokenizer engine used for Chinese segmentation. Choose `jieba` to compare quality, or switch back to `segmentit` anytime."
+          "markdownDescription": "%configuration.wordFrequency.tokenizerEngine.description%"
         }
       }
     }

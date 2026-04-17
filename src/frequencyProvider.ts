@@ -11,10 +11,10 @@ export class FrequencyItem extends vscode.TreeItem {
 
     this.iconPath = new vscode.ThemeIcon('symbol-string')
     this.contextValue = 'frequencyItem'
-    this.tooltip = new vscode.MarkdownString(`**${entry.term}**\n\n出现次数：${entry.count}`)
+    this.tooltip = new vscode.MarkdownString(`**${entry.term}**\n\n${vscode.l10n.t('Count: {0}', entry.count)}`)
     this.command = {
       command: 'wordFrequency.highlightTerm',
-      title: 'Highlight Term',
+      title: vscode.l10n.t('Highlight Term'),
       arguments: [entry.term],
     }
   }
@@ -32,7 +32,7 @@ export class WordFrequencyProvider implements vscode.TreeDataProvider<vscode.Tre
   public readonly onDidChangeTreeData = this.onDidChangeTreeDataEmitter.event
 
   private items: FrequencyItem[] = []
-  private emptyMessage = '暂无数据，点击“分析”开始统计'
+  private emptyMessage = vscode.l10n.t('No data. Click "Analyze" to start.')
 
   public setEntries(entries: readonly FrequencyEntry[]): void {
     this.items = entries.map(entry => new FrequencyItem(entry))

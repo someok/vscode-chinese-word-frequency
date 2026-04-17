@@ -1,0 +1,13 @@
+{
+  "Count: {0}": "Count: {0}",
+  "Highlight Term": "Highlight Term",
+  "No data. Click \"Analyze\" to start.": "No data. Click \"Analyze\" to start.",
+  "No active editor detected.": "No active editor detected.",
+  "Open and focus an editor before analyzing.": "Open and focus an editor before analyzing.",
+  "Document is empty. Nothing to analyze.": "Document is empty. Nothing to analyze.",
+  "Current document is empty.": "Current document is empty.",
+  "No terms were found. Adjust ignore terms and try again.": "No terms were found. Adjust ignore terms and try again.",
+  "Analysis is complete, but there are no terms to display.": "Analysis is complete, but there are no terms to display.",
+  "There is no active editor to highlight in.": "There is no active editor to highlight in.",
+  "Could not find \"{0}\" in the current document.": "Could not find \"{0}\" in the current document."
+}

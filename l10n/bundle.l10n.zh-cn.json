@@ -1,0 +1,13 @@
+{
+  "Count: {0}": "出现次数：{0}",
+  "Highlight Term": "高亮词语",
+  "No data. Click \"Analyze\" to start.": "暂无数据，点击“分析”开始统计。",
+  "No active editor detected.": "未检测到活动编辑器。",
+  "Open and focus an editor before analyzing.": "请先打开并激活一个编辑器后再分析。",
+  "Document is empty. Nothing to analyze.": "文档为空，暂无可统计内容。",
+  "Current document is empty.": "当前文档为空。",
+  "No terms were found. Adjust ignore terms and try again.": "未找到可统计词条，请调整忽略词后重试。",
+  "Analysis is complete, but there are no terms to display.": "分析完成，但没有可展示的词条。",
+  "There is no active editor to highlight in.": "当前没有可高亮的活动编辑器。",
+  "Could not find \"{0}\" in the current document.": "未在当前文档中找到“{0}”。"
+}

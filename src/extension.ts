@@ -102,15 +102,15 @@ async function analyzeActiveEditor(
 ): Promise<void> {
   const editor = vscode.window.activeTextEditor
   if (!editor) {
-    provider.clear('未检测到活动编辑器')
-    void vscode.window.showInformationMessage('请先打开并激活一个编辑器后再分析。')
+    provider.clear(vscode.l10n.t('No active editor detected.'))
+    void vscode.window.showInformationMessage(vscode.l10n.t('Open and focus an editor before analyzing.'))
     return
   }
 
   const text = editor.document.getText()
   if (!text.trim()) {
-    provider.clear('文档为空，暂无可统计内容')
-    void vscode.window.showInformationMessage('当前文档为空。')
+    provider.clear(vscode.l10n.t('Document is empty. Nothing to analyze.'))
+    void vscode.window.showInformationMessage(vscode.l10n.t('Current document is empty.'))
     return
   }
 
@@ -122,8 +122,8 @@ async function analyzeActiveEditor(
   const sortedEntries = sortEntries(counts).slice(0, maxResults)
 
   if (sortedEntries.length === 0) {
-    provider.clear('未找到可统计词条，请调整忽略词后重试')
-    void vscode.window.showInformationMessage('分析完成，但没有可展示的词条。')
+    provider.clear(vscode.l10n.t('No terms were found. Adjust ignore terms and try again.'))
+    void vscode.window.showInformationMessage(vscode.l10n.t('Analysis is complete, but there are no terms to display.'))
     return
   }
 
@@ -213,7 +213,7 @@ async function highlightTermInEditor(
   const editor = vscode.window.activeTextEditor
   if (!editor) {
     navigationRef.value = undefined
-    void vscode.window.showInformationMessage('当前没有可高亮的活动编辑器。')
+    void vscode.window.showInformationMessage(vscode.l10n.t('There is no active editor to highlight in.'))
     return
   }
 
@@ -221,7 +221,7 @@ async function highlightTermInEditor(
   if (ranges.length === 0) {
     clearHighlightInVisibleEditors(decorationType, activeDecorationType)
     navigationRef.value = undefined
-    void vscode.window.showWarningMessage(`未在当前文档中找到「${term}」。`)
+    void vscode.window.showWarningMessage(vscode.l10n.t('Could not find "{0}" in the current document.', term))
     return
   }
 
