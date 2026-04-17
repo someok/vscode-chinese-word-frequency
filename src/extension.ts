@@ -37,7 +37,7 @@ export function activate(context: vscode.ExtensionContext): void {
     borderColor: new vscode.ThemeColor('editor.findMatchBorder'),
   })
   const activeHighlightDecorationType = vscode.window.createTextEditorDecorationType({
-    backgroundColor: 'rgba(244, 67, 54, 0.36)',
+    backgroundColor: 'rgba(76, 175, 80, 0.36)',
   })
 
   const treeView = vscode.window.createTreeView(VIEW_ID, {
