@@ -1,11 +1,11 @@
 {
   "wordFrequency.title": "Word Frequency",
-  "command.analyzeActiveEditor.title": "Analyze",
+  "command.analyzeActiveEditor.title": "Analyze current editor word frequency",
   "command.clearResults.title": "Clear",
   "command.highlightTerm.title": "Highlight Term",
   "command.highlightTermReverse.title": "Up",
   "command.clearHighlights.title": "Clear Highlights",
   "configuration.wordFrequency.ignoreTerms.description": "Terms to ignore while counting. One item per line. User + Workspace + Workspace Folder values are merged and deduplicated.",
-  "configuration.wordFrequency.maxResults.description": "Maximum number of frequency rows displayed in the panel.",
+  "configuration.wordFrequency.maxResults.description": "Maximum number of frequency rows displayed in the panel, If the number is less than 10, 10 rows will be displayed.",
   "configuration.wordFrequency.tokenizerEngine.description": "Tokenizer engine used for Chinese segmentation. Choose `jieba` to compare quality, or switch back to `segmentit` anytime."
 }
