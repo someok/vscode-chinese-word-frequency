@@ -62,8 +62,9 @@
 ```json
 {
   "wordFrequency.ignoreTerms": [
-    "的",
-    "了",
+    "张三",
+    "李四",
+    "王二麻子",
     "以及"
   ],
   "wordFrequency.maxResults": 300,
