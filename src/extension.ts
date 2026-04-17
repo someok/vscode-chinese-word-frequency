@@ -31,7 +31,10 @@ export function activate(context: vscode.ExtensionContext): void {
   const highlightDecorationType = vscode.window.createTextEditorDecorationType({
     backgroundColor: new vscode.ThemeColor('editor.findMatchHighlightBackground'),
     border: '1px solid',
-    borderColor: new vscode.ThemeColor('editorError.foreground'),
+    borderColor: new vscode.ThemeColor('editor.findMatchBorder'),
+  })
+  const activeHighlightDecorationType = vscode.window.createTextEditorDecorationType({
+    backgroundColor: 'rgba(244, 67, 54, 0.36)',
   })
 
   const treeView = vscode.window.createTreeView(VIEW_ID, {
@@ -39,7 +42,7 @@ export function activate(context: vscode.ExtensionContext): void {
     showCollapseAll: false,
   })
 
-  context.subscriptions.push(treeView, highlightDecorationType)
+  context.subscriptions.push(treeView, highlightDecorationType, activeHighlightDecorationType)
 
   context.subscriptions.push(
     vscode.commands.registerCommand(ANALYZE_COMMAND, async () => {
@@ -49,17 +52,17 @@ export function activate(context: vscode.ExtensionContext): void {
       if (typeof term !== 'string' || !term.trim()) {
         return
       }
-      await highlightTermInEditor(term, highlightDecorationType, highlightNavigationRef)
+      await highlightTermInEditor(term, highlightDecorationType, activeHighlightDecorationType, highlightNavigationRef)
     }),
   )
 
   context.subscriptions.push(
     vscode.window.onDidChangeActiveTextEditor(() => {
-      clearHighlightInVisibleEditors(highlightDecorationType)
+      clearHighlightInVisibleEditors(highlightDecorationType, activeHighlightDecorationType)
       highlightNavigationRef.value = undefined
     }),
     vscode.workspace.onDidCloseTextDocument(() => {
-      clearHighlightInVisibleEditors(highlightDecorationType)
+      clearHighlightInVisibleEditors(highlightDecorationType, activeHighlightDecorationType)
       highlightNavigationRef.value = undefined
     }),
   )
@@ -180,6 +183,7 @@ function readTokenizerEngine(uri: vscode.Uri): TokenizerEngine {
 async function highlightTermInEditor(
   term: string,
   decorationType: vscode.TextEditorDecorationType,
+  activeDecorationType: vscode.TextEditorDecorationType,
   navigationRef: HighlightNavigationRef,
 ): Promise<void> {
   const editor = vscode.window.activeTextEditor
@@ -191,7 +195,7 @@ async function highlightTermInEditor(
 
   const ranges = findAllRanges(editor.document, term)
   if (ranges.length === 0) {
-    clearHighlightInVisibleEditors(decorationType)
+    clearHighlightInVisibleEditors(decorationType, activeDecorationType)
     navigationRef.value = undefined
     void vscode.window.showWarningMessage(`未在当前文档中找到「${term}」。`)
     return
@@ -212,8 +216,11 @@ async function highlightTermInEditor(
     return
   }
 
-  clearHighlightInVisibleEditors(decorationType)
-  focusedEditor.setDecorations(decorationType, ranges)
+  clearHighlightInVisibleEditors(decorationType, activeDecorationType)
+  const activeRange = ranges[currentIndex]
+  const inactiveRanges = ranges.filter((_, index) => index !== currentIndex)
+  focusedEditor.setDecorations(decorationType, inactiveRanges)
+  focusedEditor.setDecorations(activeDecorationType, [activeRange])
 
   navigationRef.value = {
     term,
@@ -221,12 +228,14 @@ async function highlightTermInEditor(
     currentIndex,
   }
 
-  activateRange(focusedEditor, ranges[currentIndex])
+  activateRange(focusedEditor, activeRange)
 }
 
-function clearHighlightInVisibleEditors(decorationType: vscode.TextEditorDecorationType): void {
+function clearHighlightInVisibleEditors(...decorationTypes: vscode.TextEditorDecorationType[]): void {
   for (const editor of vscode.window.visibleTextEditors) {
-    editor.setDecorations(decorationType, [])
+    for (const decorationType of decorationTypes) {
+      editor.setDecorations(decorationType, [])
+    }
   }
 }
 
