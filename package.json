@@ -1,8 +1,8 @@
 {
   "name": "vscode-chinese-word-frequency",
   "displayName": "Chinese Word Frequency",
-  "description": "Analyze Chinese word frequency in the active editor and highlight selected terms.",
-  "version": "1.1.5",
+  "description": "分析当前编辑器中的中文词频并突出显示选定的词汇。Analyze Chinese word frequency in the active editor and highlight selected terms.",
+  "version": "1.1.6",
   "publisher": "someok",
   "license": "MIT",
   "engines": {
